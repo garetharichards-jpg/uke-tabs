@@ -1,5 +1,5 @@
 // Offline support for the app shell. Google sign-in and Drive requests always go to the network.
-const VERSION = 'uke-tabs-v1';
+const VERSION = 'uke-tabs-v2';
 const SHELL = [
   './', 'index.html', 'app.css', 'config.js', 'manifest.webmanifest',
   'js/pitch.js', 'js/audio.js', 'js/drive.js', 'js/tabtext.js', 'js/tuner.js', 'js/viewer.js', 'js/app.js',
