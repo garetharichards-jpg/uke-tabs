@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Uke Tabs</title>
+<meta name="description" content="Ukulele tuner, Google Drive tab finder and hands-free auto-scroll.">
+<meta name="theme-color" content="#10201f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Uke Tabs">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- SONGS -->
+  <section class="screen" id="screen-songs">
+    <header class="top">
+      <h1 class="brand">Uke Tabs</h1>
+      <button class="icon-btn" id="open-settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
+      </button>
+    </header>
+
+    <form class="search" id="song-search" role="search">
+      <label class="sr-only" for="song-q">Song name</label>
+      <input id="song-q" type="search" placeholder="Search your Drive for a song…" autocomplete="off" enterkeyhint="search">
+      <button type="submit" class="btn primary">Find</button>
+    </form>
+
+    <div id="drive-status"></div>
+    <div id="song-results" class="list" aria-live="polite"></div>
+
+    <h2 class="label">Recent</h2>
+    <div id="recent" class="list"></div>
+  </section>
+
+  <!-- SETLISTS -->
+  <section class="screen" id="screen-lists" hidden>
+    <header class="top"><h1 class="brand">Song lists</h1></header>
+    <div id="list-view" hidden>
+      <div class="row-head">
+        <button class="btn ghost" id="list-back">‹ All lists</button>
+        <span class="muted" id="list-count"></span>
+      </div>
+      <h2 class="list-title" id="list-title"></h2>
+      <ol id="list-songs" class="list numbered"></ol>
+    </div>
+    <div id="lists-home">
+      <p class="muted">Pick a Google Doc or Sheet that lists your songs, one per line (Sheets: first column, or a “Song”/“Title” column).</p>
+      <form class="search" id="list-search" role="search">
+        <label class="sr-only" for="list-q">Song list name</label>
+        <input id="list-q" type="search" placeholder="Find a Doc or Sheet…" autocomplete="off" enterkeyhint="search">
+        <button type="submit" class="btn primary">Find</button>
+      </form>
+      <div id="list-results" class="list"></div>
+      <h2 class="label">Saved lists</h2>
+      <div id="saved-lists" class="list"></div>
+    </div>
+  </section>
+
+  <!-- TUNER -->
+  <section class="screen" id="screen-tuner" hidden>
+    <header class="top">
+      <h1 class="brand">Tuner</h1>
+      <label class="sr-only" for="tuning">Tuning</label>
+      <select id="tuning"></select>
+    </header>
+    <div class="tuner">
+      <div class="gauge" id="gauge">
+        <svg viewBox="0 0 300 170" aria-hidden="true">
+          <path class="arc" d="M20 160 A130 130 0 0 1 280 160"/>
+          <g id="ticks"></g>
+          <path class="zone" d="M137 32 A130 130 0 0 1 163 32"/>
+          <line id="needle" x1="150" y1="160" x2="150" y2="42"/>
+          <circle cx="150" cy="160" r="7" class="hub"/>
+        </svg>
+        <div class="readout">
+          <div class="note" id="t-note">–</div>
+          <div class="cents" id="t-cents">Tap Start and pluck a string</div>
+          <div class="hz" id="t-hz">&nbsp;</div>
+        </div>
+      </div>
+      <div class="strings" id="strings"></div>
+      <p class="muted center small">Tap a string to lock to it, or leave on Auto. Long-press to hear the note.</p>
+      <button class="btn primary big" id="tuner-toggle">Start tuner</button>
+    </div>
+  </section>
+
+  <!-- VIEWER -->
+  <section class="viewer" id="viewer" hidden>
+    <header class="vbar">
+      <button class="icon-btn" id="v-back" aria-label="Back">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <h2 id="v-title">Song</h2>
+      <div class="vbar-right">
+        <button class="icon-btn txt" id="v-smaller" aria-label="Smaller text">A−</button>
+        <button class="icon-btn txt" id="v-bigger" aria-label="Bigger text">A+</button>
+      </div>
+    </header>
+    <div class="v-scroll" id="v-scroll" tabindex="0">
+      <div id="v-content"></div>
+      <div class="v-end">End of song</div>
+    </div>
+    <div class="follow" id="follow-state" hidden></div>
+    <footer class="vctl">
+      <button class="ctl" id="v-listen" aria-pressed="false" title="Listen: pause when you stop playing">
+        <span class="mic-dot" id="mic-dot"></span>
+        <span>Listen</span>
+      </button>
+      <button class="ctl" id="v-slower" aria-label="Slower">−</button>
+      <div class="speed"><span id="v-speed">20</span><small>speed</small></div>
+      <button class="ctl" id="v-faster" aria-label="Faster">+</button>
+      <button class="ctl play" id="v-play" aria-label="Start scrolling">
+        <svg viewBox="0 0 24 24" id="play-ico" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+    </footer>
+  </section>
+
+  <nav class="tabs" id="tabs">
+    <button data-tab="songs" class="on">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      Songs
+    </button>
+    <button data-tab="lists">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+      Lists
+    </button>
+    <button data-tab="tuner">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 1 9-9"/><path d="M12 12l5-5"/></svg>
+      Tuner
+    </button>
+  </nav>
+
+  <!-- picker sheet -->
+  <div class="sheet-wrap" id="sheet" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <h2 id="sheet-title">Choose</h2>
+      <div id="sheet-body" class="list"></div>
+      <button class="btn ghost full" id="sheet-close">Cancel</button>
+    </div>
+  </div>
+
+  <!-- settings -->
+  <div class="sheet-wrap" id="settings" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <h2 id="settings-title">Settings</h2>
+      <label class="field" for="client-id">Google OAuth Client ID
+        <input id="client-id" type="text" placeholder="1234-abc.apps.googleusercontent.com" autocomplete="off" spellcheck="false">
+      </label>
+      <p class="muted small">One-time setup so the app can read your Drive. Steps are in the README on GitHub. This stays on this phone.</p>
+      <div class="btn-row">
+        <button class="btn primary" id="save-settings">Save</button>
+        <button class="btn ghost" id="disconnect">Disconnect Drive</button>
+      </div>
+      <button class="btn ghost full" id="settings-close">Close</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="config.js"></script>
+<script src="js/pitch.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/drive.js"></script>
+<script src="js/tabtext.js"></script>
+<script src="js/tuner.js"></script>
+<script src="js/viewer.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
